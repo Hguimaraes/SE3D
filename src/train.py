@@ -4,7 +4,8 @@ import speechbrain as sb
 from hyperpyyaml import load_hyperpyyaml
 
 from mlsp_challenge.trainer import SEBrain
-from mlsp_challenge.dataset import prep_librispeech
+from mlsp_challenge.data import create_datasets
+from mlsp_challenge.data import prep_librispeech
 
 def main(hparams, hparams_file, run_opts, overrides):
     # Create experiment directory
@@ -26,10 +27,10 @@ def main(hparams, hparams_file, run_opts, overrides):
         },
     )
 
-    # # Create dataset objects "train" and "valid"
-    # datasets = dataio_prep(hparams)
+    # Create dataset objects "train" and "valid"
+    datasets = create_datasets(hparams)
 
-    # # Initialize the Brain object to prepare for mask training.
+    # # Initialize the Trainer.
     # se_brain = SEBrain(
     #     modules=hparams["modules"],
     #     opt_class=hparams["opt_class"],

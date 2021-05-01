@@ -69,16 +69,12 @@ def create_json(
 
         # Construct Json structure
         json_dict[utt_id] = {
-            "waves": {
+            "wav_files": {
                 "wave_a": utterance,
                 "wave_b": utterance_b,
                 "wave_target": wav_target,
             },
-            "lengths": {
-                "len_wave_a": torchaudio.info(utterance).num_frames,
-                "len_wave_b": torchaudio.info(utterance_b).num_frames,
-                "len_wave_target": torchaudio.info(wav_target).num_frames
-            },
+            "length": torchaudio.info(wav_target).num_frames,
             "speaker_ID": utt_id.split("-")[0],
             "transcript": transcript
         }
