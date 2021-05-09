@@ -28,3 +28,30 @@ valid_folder: !ref <data_folder>/L3DAS_Task1_dev
 # logs with training statistics
 train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
     save_file: !ref <train_log>
+
+# Training Parameters
+number_of_epochs: 1
+batch_size: 64
+learning_rate: 0.0001
+dataloader_options:
+    batch_size: !ref <batch_size>
+
+# Model construction
+model: !new:mlsp_challenge.models.WaveUNet
+
+modules:
+    model: !ref <model>
+
+# Optimizer parameters
+opt_class: !name:torch.optim.Adam
+    lr: !ref <learning_rate>
+
+# Save state of the training process
+checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer
+    checkpoints_dir: !ref <model_folder>
+    recoverables:
+        model: !ref <model>
+        counter: !ref <epoch_counter>
+
+epoch_counter: !new:speechbrain.utils.epoch_loop.EpochCounter
+    limit: !ref <number_of_epochs>

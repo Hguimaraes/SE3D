@@ -9,6 +9,7 @@ from pathlib import Path
 from speechbrain.utils.data_utils import get_all_files
 
 logger = logging.getLogger(__name__)
+sample_rate = 16000
 
 """
 Set folders for train and test and prepare to create Json files.
@@ -68,13 +69,21 @@ def create_json(
             transcript = f.readline().replace('\n', '')
 
         # Construct Json structure
+        audio_len = torchaudio.info(wav_target).num_frames
         json_dict[utt_id] = {
             "wav_files": {
-                "wave_a": utterance,
-                "wave_b": utterance_b,
-                "wave_target": wav_target,
+                "predictors": {
+                    "files": [utterance, utterance_b],
+                    "start": 0,
+                    "stop": min(audio_len, 10*sample_rate)
+                },
+                "wave_target": {
+                    "file": wav_target,
+                    "start": 0,
+                    "stop": min(audio_len, 10*sample_rate)
+                },
             },
-            "length": torchaudio.info(wav_target).num_frames,
+            "length": audio_len,
             "speaker_ID": utt_id.split("-")[0],
             "transcript": transcript
         }

@@ -30,33 +30,24 @@ def main(hparams, hparams_file, run_opts, overrides):
     # Create dataset objects "train" and "valid"
     datasets = create_datasets(hparams)
 
-    # # Initialize the Trainer.
-    # se_brain = SEBrain(
-    #     modules=hparams["modules"],
-    #     opt_class=hparams["opt_class"],
-    #     hparams=hparams,
-    #     run_opts=run_opts,
-    #     checkpointer=hparams["checkpointer"],
-    # )
+    # # Initialize the Trainer
+    se_brain = SEBrain(
+        modules=hparams["modules"],
+        opt_class=hparams["opt_class"],
+        hparams=hparams,
+        run_opts=run_opts,
+        checkpointer=hparams["checkpointer"],
+    )
 
-    # # The `fit()` method iterates the training loop, calling the methods
-    # # necessary to update the parameters of the model. Since all objects
-    # # with changing state are managed by the Checkpointer, training can be
-    # # stopped at any point, and will be resumed on next call.
-    # se_brain.fit(
-    #     epoch_counter=se_brain.hparams.epoch_counter,
-    #     train_set=datasets["train"],
-    #     valid_set=datasets["valid"],
-    #     train_loader_kwargs=hparams["dataloader_options"],
-    #     valid_loader_kwargs=hparams["dataloader_options"],
-    # )
+    # Call the training loop
+    se_brain.fit(
+        epoch_counter=se_brain.hparams.epoch_counter,
+        train_set=datasets["train"],
+        valid_set=datasets["valid"],
+        train_loader_kwargs=hparams["dataloader_options"],
+        valid_loader_kwargs=hparams["dataloader_options"],
+    )
 
-    # # Load best checkpoint (highest STOI) for evaluation
-    # test_stats = se_brain.evaluate(
-    #     test_set=datasets["test"],
-    #     max_key="stoi",
-    #     test_loader_kwargs=hparams["dataloader_options"],
-    # )
     return None
 
 if __name__ == "__main__":

@@ -1,0 +1,4 @@
+jiwer==2.2.0
+librosa==0.8.0
+pystoi==0.3.3
+transformers==4.4.2
