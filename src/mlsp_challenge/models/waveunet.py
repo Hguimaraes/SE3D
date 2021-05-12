@@ -5,7 +5,7 @@ import speechbrain as sb
 class WaveUNet(nn.Module):
     def __init__(self):
         super(WaveUNet, self).__init__()
-        kernel_size=15
+        kernel_size=79
         self.model = nn.Sequential(
             nn.Conv1d(
                 in_channels=8, 

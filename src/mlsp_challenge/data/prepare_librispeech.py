@@ -18,24 +18,26 @@ def  prep_librispeech(
     data_folder:str,
     save_json_train:str,
     save_json_valid:str,
+    save_json_test:str,
     train_folder:str,
-    valid_folder:str
-    
+    valid_folder:str,
+    test_folder:str
 ):
     # File extension to look for
     extension = ["_A.wav"]
 
     # Parameters to search and save
     files = [
-        [train_folder, extension, save_json_train],
-        [valid_folder, extension, save_json_valid],
+        [train_folder, extension, save_json_train, False],
+        [valid_folder, extension, save_json_valid, False],
+        [test_folder, extension, save_json_test, True],
     ]
 
-    for folder, exts, save_json in files:
+    for folder, exts, save_json, is_test in files:
         a_files = get_all_files(folder, match_and=exts)
 
         # Create Json for dataio
-        create_json(a_files, save_json)
+        create_json(a_files, save_json, is_test=is_test)
 
 """
 Extracts info from the 4 files associated with each sample.
@@ -52,8 +54,14 @@ file.txt: Transcripts for file.wav. We are going to perform WER on this.
 """
 def create_json(
     a_wav_list:List[str],
-    json_file:str
+    json_file:str,
+    is_test:bool
 ):
+    # Call the specific function for testset
+    if is_test:
+        create_json_test(a_wav_list, json_file)
+        return None
+
     # Processing all the wav files in the list
     json_dict = {}
     for utterance in tqdm(a_wav_list):
@@ -86,6 +94,37 @@ def create_json(
             "length": audio_len,
             "speaker_ID": utt_id.split("-")[0],
             "transcript": transcript
+        }
+
+    # Writing the dictionary to the json file
+    with open(json_file, mode="w") as json_f:
+        json.dump(json_dict, json_f, indent=2)
+
+    logger.info(f"{json_file} successfully created!")
+
+def create_json_test(
+    a_wav_list:List[str],
+    json_file:str
+):
+    # Processing all the wav files in the list
+    json_dict = {}
+    for utterance in tqdm(a_wav_list):
+        # Manipulate paths and get info about the 4 files
+        utt_id = Path(utterance).stem[:-2]
+        utterance_b = utterance.replace("_A", "_B")
+
+        # Construct Json structure
+        audio_len = torchaudio.info(utterance).num_frames
+        json_dict[utt_id] = {
+            "wav_files": {
+                "predictors": {
+                    "files": [utterance, utterance_b],
+                    "start": 0,
+                    "stop": min(audio_len, 10*sample_rate)
+                },
+            },
+            "length": audio_len,
+            "speaker_ID": utt_id.split("-")[0]
         }
 
     # Writing the dictionary to the json file

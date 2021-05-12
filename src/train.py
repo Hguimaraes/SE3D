@@ -22,15 +22,17 @@ def main(hparams, hparams_file, run_opts, overrides):
             "data_folder": hparams["data_folder"],
             "save_json_train": hparams["train_annotation"],
             "save_json_valid": hparams["valid_annotation"],
+            "save_json_test": hparams["test_annotation"],
             "train_folder": hparams["train_folder"],
             "valid_folder": hparams["valid_folder"],
+            "test_folder": hparams["test_folder"],
         },
     )
 
     # Create dataset objects "train" and "valid"
     datasets = create_datasets(hparams)
 
-    # # Initialize the Trainer
+    # Initialize the Trainer
     se_brain = SEBrain(
         modules=hparams["modules"],
         opt_class=hparams["opt_class"],
@@ -46,6 +48,13 @@ def main(hparams, hparams_file, run_opts, overrides):
         valid_set=datasets["valid"],
         train_loader_kwargs=hparams["dataloader_options"],
         valid_loader_kwargs=hparams["dataloader_options"],
+    )
+
+    # Apply on test set
+    se_brain.predict(
+        test_set=datasets["test"],
+        max_key="task1_metric",
+        test_loader_kwargs=hparams["dataloader_options"]
     )
 
     return None

@@ -17,21 +17,25 @@ data_folder: ../dataset
 output_folder: !ref ../logs/<exp_name>
 model_folder: !ref <output_folder>/save
 train_log: !ref <output_folder>/train_log.txt
+audio_result: !ref <output_folder>/audio_results
+npy_result: !ref <output_folder>/npy_results
 
 # Path where data manifest files will be stored
 # The data manifest files are created by the data preparation script.
 train_annotation: !ref <data_folder>/train.json
 valid_annotation: !ref <data_folder>/valid.json
+test_annotation: !ref <data_folder>/test.json
 train_folder: !ref <data_folder>/L3DAS_Task1_train100
 valid_folder: !ref <data_folder>/L3DAS_Task1_dev
+test_folder: !ref <data_folder>/L3DAS_Task1_test
 
 # logs with training statistics
 train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
     save_file: !ref <train_log>
 
 # Training Parameters
-number_of_epochs: 1
-batch_size: 64
+number_of_epochs: 5
+batch_size: 1
 learning_rate: 0.0001
 dataloader_options:
     batch_size: !ref <batch_size>
