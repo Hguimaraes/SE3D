@@ -19,15 +19,15 @@ class SEBrain(sb.Brain):
         targets, lens = batch.target
 
         # Compare the waveforms
-        loss = sb.nnet.losses.mse_loss(predictions, targets)
+        loss = self.modules.loss(predictions, targets)
 
         # Append this batch of losses to the loss metric
-        self.loss_metric.append(
-            batch.id, predictions, targets, reduction="batch"
-        )
+        # self.loss_metric.append(
+        #     batch.id, predictions, targets
+        # )
 
         # Since it is slow, only compute task1 metric on evalution sets
-        if stage != sb.Stage.TRAIN:
+        if (stage != sb.Stage.TRAIN):
             self.l3das_task1_metric.append(
                 batch.id,
                 np.squeeze(targets.cpu().numpy()),
@@ -39,7 +39,7 @@ class SEBrain(sb.Brain):
     def on_stage_start(self, stage, epoch=None):
         # Set up statistics trackers for this stage
         self.loss_metric = sb.utils.metric_stats.MetricStats(
-            metric=sb.nnet.losses.mse_loss
+            metric=self.modules.loss
         )
 
         # Add a metric for evaluation sets
@@ -53,15 +53,14 @@ class SEBrain(sb.Brain):
         if stage == sb.Stage.TRAIN:
             self.train_loss = stage_loss
 
-        # Summarize the statistics from the stage for record-keeping.
-        else:
+        # At the end of validation, we can write stats and checkpoints
+        if (stage == sb.Stage.VALID):
+            # Summarize the statistics from the stage for record-keeping.
             stats = {
                 "loss": stage_loss,
                 "task1_metric": self.l3das_task1_metric.summarize("average"),
             }
 
-        # At the end of validation, we can write stats and checkpoints
-        if stage == sb.Stage.VALID:
             # The train_logger writes a summary to stdout and to the logfile.
             self.hparams.train_logger.log_stats(
                 {"Epoch": epoch},
@@ -71,7 +70,7 @@ class SEBrain(sb.Brain):
 
             # Save the current checkpoint and delete previous checkpoints,
             # unless they have the current best task1_metric
-            self.checkpointer.save_and_keep_only(meta=stats, max_keys=["loss"])
+            self.checkpointer.save_and_keep_only(meta=stats, min_keys=["loss"])
     
     def predict(
         self,

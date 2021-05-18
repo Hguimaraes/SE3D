@@ -1,5 +1,6 @@
 import os
 import torch
+import time
 import jiwer
 import librosa
 import warnings
@@ -60,23 +61,23 @@ def task1_metric(clean_speech_array, denoised_speech_array, sr=16000):
     METRIC = 0.
     len_samples = clean_speech_array.shape[0]
 
-    for example_num, (clean_speech, denoised_speech) in enumerate(zip(clean_speech_array, denoised_speech_array)):
-        wer_metric = wer(clean_speech, denoised_speech)
-        if wer_metric is not None:  #if there is no speech in the segment
-            # metric of the sample
-            stoi_metric = stoi(clean_speech, denoised_speech, sr, extended=False)
-            wer_metric = np.clip(wer_metric, 0., 1.)
-            stoi_metric = np.clip(stoi_metric, 0., 1.)
-            metric = (stoi_metric + (1. - wer_metric)) / 2.
+    # for example_num, (clean_speech, denoised_speech) in enumerate(zip(clean_speech_array, denoised_speech_array)):
+    #     wer_metric = wer(clean_speech, denoised_speech)
+    #     if wer_metric is not None:  #if there is no speech in the segment
+    #         # metric of the sample
+    #         stoi_metric = stoi(clean_speech, denoised_speech, sr, extended=False)
+    #         wer_metric = np.clip(wer_metric, 0., 1.)
+    #         stoi_metric = np.clip(stoi_metric, 0., 1.)
+    #         metric = (stoi_metric + (1. - wer_metric)) / 2.
 
-            # metric of the batch
-            METRIC += (1. / float(example_num + 1)) * (metric - METRIC)
-            WER += (1. / float(example_num + 1)) * (wer_metric - WER)
-            STOI += (1. / float(example_num + 1)) * (stoi_metric - STOI)
+    #         # metric of the batch
+    #         METRIC += (1. / float(example_num + 1)) * (metric - METRIC)
+    #         WER += (1. / float(example_num + 1)) * (wer_metric - WER)
+    #         STOI += (1. / float(example_num + 1)) * (stoi_metric - STOI)
 
-        else:
-            metric = None
-            STOI = None
+    #     else:
+    #         metric = None
+    #         STOI = None
 
     return torch.Tensor([METRIC])
 

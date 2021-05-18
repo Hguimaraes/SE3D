@@ -54,7 +54,7 @@ def main(hparams, hparams_file, run_opts, overrides):
     se_brain.predict(
         test_set=datasets["test"],
         max_key="task1_metric",
-        test_loader_kwargs=hparams["dataloader_options"]
+        test_loader_kwargs=hparams["test_dataloader_options"]
     )
 
     return None

@@ -2,6 +2,7 @@ import re
 import glob
 import json
 import logging
+import itertools
 import torchaudio
 from tqdm import tqdm
 from typing import List
@@ -19,7 +20,7 @@ def  prep_librispeech(
     save_json_train:str,
     save_json_valid:str,
     save_json_test:str,
-    train_folder:str,
+    train_folder:list,
     valid_folder:str,
     test_folder:str
 ):
@@ -34,7 +35,11 @@ def  prep_librispeech(
     ]
 
     for folder, exts, save_json, is_test in files:
-        a_files = get_all_files(folder, match_and=exts)
+        if isinstance(folder, list):
+            a_files = [get_all_files(f, match_and=exts) for f in folder]
+            a_files = list(itertools.chain(*a_files))
+        else:
+            a_files = get_all_files(folder, match_and=exts)
 
         # Create Json for dataio
         create_json(a_files, save_json, is_test=is_test)

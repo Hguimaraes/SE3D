@@ -5,19 +5,53 @@ from speechbrain.dataio.dataset import DynamicItemDataset
 def create_datasets(hparams):
     datasets = {}
 
+    """
+    Pad an audio to a power of 2**depth
+    necessary for decimate operation in the network
+    """
+    def pad_power(audio):
+        depth = hparams['m_depth']
+        power = 2**depth-1
+        n = audio.shape[0]
+        audio = audio.transpose(0, 1)
+
+        if n % (power + 1) != 0:
+            diff = (n|power) + 1 - n
+            audio = torch.nn.functional.pad(audio, (0, diff))
+
+        return audio
+
+
     @speechbrain.utils.data_pipeline.takes("wav_files")
     @speechbrain.utils.data_pipeline.provides("predictor", "target")
     def audio_pipeline(wav_files):
-        predictor = speechbrain.dataio.dataio.read_audio_multichannel(wav_files['predictors'])
-        target = speechbrain.dataio.dataio.read_audio(wav_files['wave_target'])
+        max_size = hparams['max_train_sample_size']
+        predictor = speechbrain.dataio.dataio.read_audio_multichannel(
+            wav_files['predictors']
+        )
 
-        return predictor.transpose(0, 1), torch.unsqueeze(target, 0)
-    
+        target = speechbrain.dataio.dataio.read_audio(wav_files['wave_target'])
+        target = torch.unsqueeze(target, 1)
+
+        # sampling process
+        samples = predictor.shape[0]
+        if samples > max_size:
+            offset = torch.randint(low=0, high=max_size-1, size=(1,))
+            target = target[offset:(offset+max_size), :]
+            predictor = predictor[offset:(offset+max_size), :]
+        
+        return pad_power(predictor), pad_power(target)
+
+
     @speechbrain.utils.data_pipeline.takes("wav_files")
     @speechbrain.utils.data_pipeline.provides("predictor")
     def audio_pipeline_test(wav_files):
-        predictor = speechbrain.dataio.dataio.read_audio_multichannel(wav_files['predictors'])
-        return predictor.transpose(0, 1)
+        predictor = speechbrain.dataio.dataio.read_audio_multichannel(
+            wav_files['predictors']
+        )
+        predictor = pad_power(predictor)
+
+        return predictor
     
     for set_ in ['train', 'valid', 'test']:
         output_keys = ["id", "predictor", "target", "transcript"]

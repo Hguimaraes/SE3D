@@ -1,3 +1,3 @@
-from mlsp_challenge.models.waveunet import WaveUNet
+from mlsp_challenge.models.sewunet import SEWUNet
 
-__all__ = ["WaveUNet"]
+__all__ = ["SEWUNet"]

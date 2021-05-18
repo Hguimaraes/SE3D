@@ -25,7 +25,7 @@ npy_result: !ref <output_folder>/npy_results
 train_annotation: !ref <data_folder>/train.json
 valid_annotation: !ref <data_folder>/valid.json
 test_annotation: !ref <data_folder>/test.json
-train_folder: !ref <data_folder>/L3DAS_Task1_train100
+train_folder: [!ref <data_folder>/L3DAS_Task1_train100, !ref <data_folder>/L3DAS_Task1_train360]
 valid_folder: !ref <data_folder>/L3DAS_Task1_dev
 test_folder: !ref <data_folder>/L3DAS_Task1_test
 
@@ -34,17 +34,32 @@ train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
     save_file: !ref <train_log>
 
 # Training Parameters
+max_train_sample_size: 48000    # Maximum number of samples to use during train
 number_of_epochs: 5
-batch_size: 1
+batch_size: 16
 learning_rate: 0.0001
 dataloader_options:
     batch_size: !ref <batch_size>
+test_dataloader_options:
+    batch_size: 1
 
 # Model construction
-model: !new:mlsp_challenge.models.WaveUNet
+m_depth: 5                      # model depth ==> depth of Wave-U-Net
+model: !new:mlsp_challenge.models.SEWUNet
+    in_channels: 8
+    out_channels: 1
+    depth: !ref <m_depth>
+    fsize: 15
+    moffset: 10
+    fd: 15
+    fu: 5
+
+loss: !new:mlsp_challenge.losses.PerceptualLoss
+    PRETRAINED_MODEL_PATH: '../models/wav2vec_large.pt'
 
 modules:
     model: !ref <model>
+    loss: !ref <loss>
 
 # Optimizer parameters
 opt_class: !name:torch.optim.Adam
