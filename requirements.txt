@@ -2,3 +2,12 @@ jiwer==2.2.0
 librosa==0.8.0
 pystoi==0.3.3
 transformers==4.4.2
+fairseq==0.10.2      
+numpy==1.20.2      
+python-Levenshtein==0.12.2      
+scikit-learn==0.24.2      
+speechbrain==0.5.7       
+torch==1.8.1       
+torchaudio==0.8.1       
+tqdm==4.60.0      
+transformers==4.4.2
