@@ -11,3 +11,6 @@ torch==1.8.1
 torchaudio==0.8.1       
 tqdm==4.60.0      
 transformers==4.4.2
+torch-stoi==0.1.2
+speechbrain==0.5.7
+pandas

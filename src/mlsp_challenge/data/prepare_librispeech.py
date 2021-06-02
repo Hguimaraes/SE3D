@@ -4,6 +4,7 @@ import json
 import logging
 import itertools
 import torchaudio
+import numpy as np
 from tqdm import tqdm
 from typing import List
 from pathlib import Path
@@ -29,12 +30,12 @@ def  prep_librispeech(
 
     # Parameters to search and save
     files = [
-        [train_folder, extension, save_json_train, False],
-        [valid_folder, extension, save_json_valid, False],
-        [test_folder, extension, save_json_test, True],
+        [train_folder, extension, save_json_train, False, False],
+        [valid_folder, extension, save_json_valid, False, True],
+        [test_folder, extension, save_json_test, True, False],
     ]
 
-    for folder, exts, save_json, is_test in files:
+    for folder, exts, save_json, is_test, sample in files:
         if isinstance(folder, list):
             a_files = [get_all_files(f, match_and=exts) for f in folder]
             a_files = list(itertools.chain(*a_files))
@@ -42,7 +43,7 @@ def  prep_librispeech(
             a_files = get_all_files(folder, match_and=exts)
 
         # Create Json for dataio
-        create_json(a_files, save_json, is_test=is_test)
+        create_json(a_files, save_json, is_test=is_test, sample=sample)
 
 """
 Extracts info from the 4 files associated with each sample.
@@ -60,8 +61,13 @@ file.txt: Transcripts for file.wav. We are going to perform WER on this.
 def create_json(
     a_wav_list:List[str],
     json_file:str,
-    is_test:bool
+    is_test:bool,
+    sample:bool
 ):
+    # Sample the a_wav_list
+    if sample:
+        a_wav_list = np.random.choice(a_wav_list, 250)
+
     # Call the specific function for testset
     if is_test:
         create_json_test(a_wav_list, json_file)
@@ -125,7 +131,7 @@ def create_json_test(
                 "predictors": {
                     "files": [utterance, utterance_b],
                     "start": 0,
-                    "stop": min(audio_len, 10*sample_rate)
+                    "stop": audio_len
                 },
             },
             "length": audio_len,

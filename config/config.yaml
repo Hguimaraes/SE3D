@@ -12,7 +12,7 @@ __set_seed: !apply:torch.manual_seed [!ref <seed>]
 
 # Set up folders for reading from and writing to
 # .strftime ['%Y%m%d_%H%M%S']
-exp_name: first_version
+exp_name: fcn40_55epchs_prcpt_stoiloss_ft_460h
 data_folder: ../dataset
 output_folder: !ref ../logs/<exp_name>
 model_folder: !ref <output_folder>/save
@@ -34,8 +34,8 @@ train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
     save_file: !ref <train_log>
 
 # Training Parameters
-max_train_sample_size: 48000    # Maximum number of samples to use during train
-number_of_epochs: 5
+max_train_sample_size: 32000    # Maximum number of samples to use during train
+number_of_epochs: 55
 batch_size: 16
 learning_rate: 0.0001
 dataloader_options:
@@ -44,18 +44,20 @@ test_dataloader_options:
     batch_size: 1
 
 # Model construction
-m_depth: 5                      # model depth ==> depth of Wave-U-Net
-model: !new:mlsp_challenge.models.SEWUNet
+m_depth: 1                      # model depth ==> depth of Wave-U-Net / Use 1 if FCN
+model: !new:mlsp_challenge.models.FCN
     in_channels: 8
     out_channels: 1
-    depth: !ref <m_depth>
-    fsize: 15
-    moffset: 10
-    fd: 15
-    fu: 5
+    kernel_size: 55
+    base_channels: 40
+    use_sinc: False
+# m_depth: 7                      # model depth ==> depth of Wave-U-Net / Use 1 if FCN
+# model: !new:mlsp_challenge.models.SEWUNet
+#     depth: !ref <m_depth>
 
 loss: !new:mlsp_challenge.losses.PerceptualLoss
     PRETRAINED_MODEL_PATH: '../models/wav2vec_large.pt'
+    alpha: 5
 
 modules:
     model: !ref <model>
@@ -64,6 +66,7 @@ modules:
 # Optimizer parameters
 opt_class: !name:torch.optim.Adam
     lr: !ref <learning_rate>
+    weight_decay: 0.1
 
 # Save state of the training process
 checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer

@@ -131,3 +131,4 @@ dmypy.json
 # data files
 dataset/
 logs/
+models/*.pt

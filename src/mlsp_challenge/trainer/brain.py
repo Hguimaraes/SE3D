@@ -9,22 +9,16 @@ from mlsp_challenge.losses import task1_metric
 class SEBrain(sb.Brain):
     def compute_forward(self, batch, stage):
         batch = batch.to(self.device)
-        noisy_wavs, lens = batch.predictor
-        out = self.modules.model(noisy_wavs)
+        noisy_wavs, lens = batch.predictor # B, C, L
 
-        return out/out.max(2, keepdim=True)[0] * 0.9
+        return self.modules.model(noisy_wavs)
     
     def compute_objectives(self, predictions, batch, stage):
         # Get clean targets
         targets, lens = batch.target
 
         # Compare the waveforms
-        loss = self.modules.loss(predictions, targets)
-
-        # Append this batch of losses to the loss metric
-        # self.loss_metric.append(
-        #     batch.id, predictions, targets
-        # )
+        loss = self.modules.loss(predictions, targets, lens)
 
         # Since it is slow, only compute task1 metric on evalution sets
         if (stage != sb.Stage.TRAIN):
@@ -70,7 +64,7 @@ class SEBrain(sb.Brain):
 
             # Save the current checkpoint and delete previous checkpoints,
             # unless they have the current best task1_metric
-            self.checkpointer.save_and_keep_only(meta=stats, min_keys=["loss"])
+            self.checkpointer.save_and_keep_only(meta=stats, max_keys=["task1_metric"])
     
     def predict(
         self,
@@ -115,6 +109,7 @@ class SEBrain(sb.Brain):
 
         for count, utt in enumerate(utt_id):
             audio = batch[count, 0, :].detach().cpu()
+            # audio = audio/audio.max() * 0.9 # Normalization
 
             # Save as wav file to listen to the result
             sb.dataio.dataio.write_audio(
@@ -129,6 +124,6 @@ class SEBrain(sb.Brain):
             # Save as .npy for submission
             with open(
                 os.path.join(npy_path, 
-                "{}.wav".format(utt)), 'wb'
+                "{}.npy".format(utt)), 'wb'
             ) as f:
                 np.save(f, audio.numpy())
