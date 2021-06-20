@@ -12,7 +12,7 @@ __set_seed: !apply:torch.manual_seed [!ref <seed>]
 
 # Set up folders for reading from and writing to
 # .strftime ['%Y%m%d_%H%M%S']
-exp_name: fcn40_55epchs_prcpt_stoiloss_ft_460h
+exp_name: fcn40_50epchs_prcpt_stoiloss_ft_460h
 data_folder: ../dataset
 output_folder: !ref ../logs/<exp_name>
 model_folder: !ref <output_folder>/save
@@ -35,7 +35,7 @@ train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
 
 # Training Parameters
 max_train_sample_size: 32000    # Maximum number of samples to use during train
-number_of_epochs: 55
+number_of_epochs: 50
 batch_size: 16
 learning_rate: 0.0001
 dataloader_options:
@@ -57,7 +57,7 @@ model: !new:mlsp_challenge.models.FCN
 
 loss: !new:mlsp_challenge.losses.PerceptualLoss
     PRETRAINED_MODEL_PATH: '../models/wav2vec_large.pt'
-    alpha: 5
+    alpha: 1000
 
 modules:
     model: !ref <model>
@@ -66,7 +66,7 @@ modules:
 # Optimizer parameters
 opt_class: !name:torch.optim.Adam
     lr: !ref <learning_rate>
-    weight_decay: 0.1
+    weight_decay: 0.01
 
 # Save state of the training process
 checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer
