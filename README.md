@@ -1,6 +1,6 @@
 # SE3D
 
-**tl;dr**: 2nd place solution at L3DAS21 challenge Task 1. Using FCN architecture and PFPL + STOI Loss.
+**tl;dr**: **2nd place solution** at L3DAS21 challenge Task 1. Using FCN architecture and PFPL + STOI Loss.
 
 ## Abstract
 
@@ -15,7 +15,7 @@ The Loss function is the key component in this work. Hsieh et al. proposed a Pho
 
 In a similar way, we modified the original PFPL to use a STOI Loss component instead of the proposed *MAE loss*. The equation is described bellow.
 
-<a href="https://www.codecogs.com/eqnedit.php?latex=\begin{equation}&space;\mathcal{L}(y,&space;\hat{y})&space;=&space;\mathcal{L}_{stoi}&space;&plus;&space;\alpha&space;\left[&space;\&space;\underset{f&space;\in&space;\mathcal{F}}{\text{sup}}\mathbb{E}_{\mu}\left[&space;f&space;\left(&space;c&space;\right)&space;\right]&space;-&space;\mathbb{E}_{\nu}\left[&space;f&space;\left(\hat{c}\right)&space;\right]&space;\right]&space;\end{equation}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\begin{equation}&space;\mathcal{L}(y,&space;\hat{y})&space;=&space;\mathcal{L}_{stoi}&space;&plus;&space;\alpha&space;\left[&space;\&space;\underset{f&space;\in&space;\mathcal{F}}{\text{sup}}\mathbb{E}_{\mu}\left[&space;f&space;\left(&space;c&space;\right)&space;\right]&space;-&space;\mathbb{E}_{\nu}\left[&space;f&space;\left(\hat{c}\right)&space;\right]&space;\right]&space;\end{equation}" title="\begin{equation} \mathcal{L}(y, \hat{y}) = \mathcal{L}_{stoi} + \alpha \left[ \ \underset{f \in \mathcal{F}}{\text{sup}}\mathbb{E}_{\mu}\left[ f \left( c \right) \right] - \mathbb{E}_{\nu}\left[ f \left(\hat{c}\right) \right] \right] \end{equation}" /></a>
+![image info](./assets/loss.png)
 
 For the challenge submission we used *alpha* = 5. For small values of *alpha*, the PFPL + STOI-LF and STOI-LF are almost identical since the STOI-LF is predominant in the total value of the loss function. A *alpha* = 1000 resulted in better metrics.
 
