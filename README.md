@@ -59,3 +59,14 @@ python train.py ../config/config.yaml
 ```
 
 ## Citation
+
+```latex
+@inproceedings{guimaraes2021optimizing,
+  title = {Optimizing Time Domain Fully Convolutional Networks for 3D Speech Enhancement in a Reverberant Environment Using Perceptual Losses},
+  author = {Guimar{\~a}es, Heitor R. and Beccaro, Wesley and Ram{\'\i}rez, Miguel A},
+  booktitle = {2021 IEEE 31st International Workshop on Machine Learning for Signal Processing (MLSP)},
+  pages = {1--6},
+  year = {2021},
+  organization = {IEEE},
+}
+```
